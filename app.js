@@ -256,7 +256,8 @@ function todayHTML() {
     h += `<div class="banner ${ageD >= 14 ? 'red' : ''}"><b>Son yedek ${ageD} gün önce.</b> Bu süredeki değişiklikler yedekte yok.
       <div class="btns"><button class="btn sm" data-a="exportFile">Şimdi yedekle</button><button class="btn sec sm" data-a="goto" data-p="backup">Yedek ayarları</button></div></div>`;
   }
-  if (!birds.length) h += `<div class="card" data-a="guide"><b>👋 Hoş geldin!</b><div class="sub">İlk kuşunu eklemek için alttaki Kuşlar sekmesine geç. Kısa bir kılavuz okumak için dokun.</div></div>`;
+  if (!birds.length) h += `<div class="card" data-a="guide"><b>👋 Hoş geldin!</b><div class="sub">İlk kuşunu eklemek için alttaki Kuşlar sekmesine geç. Kısa bir kılavuz okumak için dokun.</div></div>
+    <div class="card row" data-a="scanPed"><span style="font-size:26px">📷</span><div class="grow"><b>Pedigre görselinden ekle</b><div class="sub">Elindeki pedigrenin fotoğrafını yükle, kuş ve atalar otomatik kaydedilsin</div></div><span>›</span></div>`;
   h += `<h3>Kuluçka takibi</h3>`;
   if (!inc.length) h += `<div class="empty">Devam eden kuluçka yok.</div>`;
   inc.sort((a, b) => a.layDate.localeCompare(b.layDate)).forEach(i => {
@@ -306,6 +307,8 @@ function birdsFiltered() {
 }
 function birdsHTML() {
   return `<h2>Kuşlar</h2>
+  <div class="card row" data-a="scanPed"><span style="font-size:26px">📷</span>
+    <div class="grow"><b>Pedigre görselinden kuş ekle</b><div class="sub">Fotoğraf veya PDF yükle, yapay zekâ doldursun</div></div><span>›</span></div>
   <div class="search"><input id="bq" placeholder="İsim, künye, renk ara…" value="${esc(bf.q)}"></div>
   <div class="filters">
     <select id="bs"><option value="ALL" ${bf.s === 'ALL' ? 'selected' : ''}>Tüm durumlar</option>${OPT.bstatus.map(o => `<option ${bf.s === o ? 'selected' : ''}>${o}</option>`).join('')}</select>
@@ -470,7 +473,12 @@ async function saveForm() {
     if (obj.fatherId === obj.id || obj.motherId === obj.id) { toast('Kuş kendi ebeveyni olamaz'); return; }
     obj.pedigree = buildPed(obj);
   }
+  const scanned = !!obj.scanned; delete obj.scanned;
   await put(store, obj);
+  if (store === 'birds' && scanned && obj.pedigree) {
+    const n = await saveAncestors(obj.pedigree, obj);
+    closeModal(); render(); toast('Kuş kaydedildi' + (n ? ` · ${n} ata pasif kayıt olarak eklendi` : '')); pedView(obj.id); return;
+  }
   if (store === 'birds' && obj.incubationId && !ex) {
     await syncInc(obj.incubationId); render(); openChicks(obj.incubationId); toast('Yavru eklendi, soy ağacı otomatik oluşturuldu'); return;
   }
@@ -866,6 +874,112 @@ async function pedShare(id, type) {
   toast('Dosya indirildi');
 }
 
+
+/* ============ PEDİGRE GÖRSELİNDEN KUŞ EKLEME (Gemini) ============ */
+const SHARED_GEMINI_KEY = ''; // isteğe bağlı: sahibi, sadece bu siteden çalışan (referrer kısıtlı) bir anahtar yazabilir
+const GEMINI_MODELS = ['gemini-3.5-flash-lite', 'gemini-3.1-flash-lite', 'gemini-2.5-flash-lite'];
+const aiKey = () => ST.geminiKey || SHARED_GEMINI_KEY;
+const AI_PROMPT = `Bu bir güvercin (yarış güvercini) pedigre görseli/belgesidir. Ana kuşu ve atalarını en fazla 3 nesil olarak çıkar.
+SADECE şu JSON'u döndür (açıklama yok):
+{"root":{"ring":"","name":"","owner":"","color":"","gender":"ERKEK|DİŞİ|BİLİNMİYOR","notes":""},
+"f":{...},"m":{...},"ff":{...},"fm":{...},"mf":{...},"mm":{...},"fff":{...},"ffm":{...},"fmf":{...},"fmm":{...},"mff":{...},"mfm":{...},"mmf":{...},"mmm":{...}}
+Her kutu: {"ring":"","name":"","owner":"","color":"","notes":""}.
+Anahtarlar: f=baba, m=anne. İki harf: ff=babanın babası, fm=babanın annesi, mf=annenin babası, mm=annenin annesi. Üç harf aynı mantıkla (fff, ffm, fmf, fmm, mff, mfm, mmf, mmm).
+Yatay pedigrelerde her çiftin üstteki kutusu erkek (baba), alttaki dişi (anne) olur.
+KURALLAR: ring = künye/halka numarası, görselde yazdığı gibi (ülke kodu ve yıl dahil, ör. BEL 01-3266512, NL 13-1962026). Yanındaki M/V/E/D/♂/♀ cinsiyet işaretleri künyeye dahil değildir.
+name = kuşun adı (tırnaksız). owner = yetiştirici/sahip adı. color = renk (ör. Blue, Cheq). notes = kutuda yazan başarılar/dereceler/notlar (kısa, ';' ile ayır).
+Emin olmadığın veya görünmeyen alanı "" bırak, ASLA uydurma. Bu bir pedigre değilse {"error":"Pedigre değil"} döndür.`;
+const AI_KEYS = ['f', 'm', 'ff', 'fm', 'mf', 'mm', 'fff', 'ffm', 'fmf', 'fmm', 'mff', 'mfm', 'mmf', 'mmm'];
+
+function aiKeyModal() {
+  openModal('Yapay zekâ ayarı', `
+    <div class="sub">Pedigre görselini okumak için ücretsiz bir Google (Gemini) anahtarı gerekir. Bir kez girersin.</div>
+    <ol class="sub" style="padding-left:20px">
+      <li><a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener" style="color:var(--gold)">aistudio.google.com/apikey</a> adresini aç, Google hesabınla giriş yap.</li>
+      <li><b>Create API key</b>'e bas, çıkan anahtarı kopyala.</li>
+      <li>Aşağıya yapıştır.</li>
+    </ol>
+    <label for="aiKeyIn">Gemini API anahtarı</label>
+    <input id="aiKeyIn" value="${esc(ST.geminiKey || '')}" placeholder="AIza…" autocomplete="off" autocapitalize="off">
+    <label class="chk" style="margin-top:12px"><input type="checkbox" id="aiConsent" ${ST.aiConsent ? 'checked' : ''}>
+      <span>Yüklediğim pedigre görselinin okunmak üzere <b>Google'ın yapay zekâ servisine gönderileceğini</b> anlıyorum. Ücretsiz kullanımda Google görseli ürün geliştirmede kullanabilir. Başka verilerim (kuş listem vb.) gönderilmez.</span></label>
+    <div class="btns"><button class="btn" data-a="aiKeySave">Kaydet ve devam et</button><button class="btn sec" data-a="close">Vazgeç</button></div>`);
+}
+async function aiKeySave() {
+  const k = ($('#aiKeyIn').value || '').trim();
+  if (!aiKey() && !k) return toast('Anahtar gerekli');
+  if (!$('#aiConsent').checked) return toast('Devam etmek için onay kutusunu işaretle');
+  ST.geminiKey = k; ST.aiConsent = true; await saveST(); scanPed();
+}
+function scanPed() {
+  if (!aiKey() || !ST.aiConsent) return aiKeyModal();
+  openModal('Pedigre görselinden kuş ekle', `
+    <div class="sub">Pedigre <b>fotoğrafını çek</b> veya <b>dosyadan seç</b> (JPG, PNG, PDF). Yapay zekâ kuşu ve atalarını okuyup kaydeder; sen kontrol edip onaylarsın.</div>
+    <div class="hint">En iyi sonuç için: sayfanın tamamı görünsün, düz ve net olsun, yansıma olmasın.</div>
+    <input type="file" id="scanIn" accept="image/*,application/pdf" style="margin-top:8px">
+    <div class="btns"><button class="btn sec sm" data-a="aiKeyChange">Anahtarı değiştir</button><button class="btn sec sm" data-a="close">Kapat</button></div>`);
+}
+const toB64 = f => new Promise((res, rej) => { const r = new FileReader(); r.onload = () => res(String(r.result).split(',')[1]); r.onerror = () => rej(new Error('Dosya okunamadı')); r.readAsDataURL(f); });
+async function filePart(file) {
+  if (file.type === 'application/pdf') {
+    if (file.size > 15 * 1048576) throw new Error('PDF çok büyük (en fazla 15 MB).');
+    return { inline_data: { mime_type: 'application/pdf', data: await toB64(file) } };
+  }
+  if (!file.type.startsWith('image/')) throw new Error('Sadece fotoğraf (JPG/PNG) veya PDF yükleyebilirsin.');
+  const du = await shrink(file, 1800, 0.85);
+  return { inline_data: { mime_type: 'image/jpeg', data: du.split(',')[1] } };
+}
+async function geminiPed(part) {
+  let lastErr;
+  for (const m of GEMINI_MODELS) {
+    let r;
+    try {
+      r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${m}:generateContent?key=${encodeURIComponent(aiKey())}`, {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ contents: [{ parts: [{ text: AI_PROMPT }, part] }], generationConfig: { temperature: 0, responseMimeType: 'application/json' } })
+      });
+    } catch (_) { throw new Error('Servise ulaşılamadı. İnternet bağlantını kontrol et.'); }
+    const d = await r.json().catch(() => ({}));
+    if (r.status === 404) { lastErr = new Error('Yapay zekâ modeli bulunamadı (uygulama güncellemesi gerekebilir).'); continue; }
+    if (!r.ok) {
+      const msg = (d.error && d.error.message) || '';
+      if (r.status === 400 && /API key/i.test(msg)) throw new Error('API anahtarı geçersiz. “Anahtarı değiştir” ile doğru anahtarı gir.');
+      if (r.status === 403) throw new Error('Bu anahtar kullanılamıyor (izin yok). Yeni bir anahtar oluşturmayı dene.');
+      if (r.status === 429) throw new Error('Ücretsiz kullanım limiti doldu. Biraz sonra veya yarın tekrar dene.');
+      lastErr = new Error(msg || 'Servis hatası (' + r.status + ')');
+      if (r.status >= 500) continue; throw lastErr;
+    }
+    const txt = ((d.candidates && d.candidates[0] && d.candidates[0].content && d.candidates[0].content.parts) || []).map(p => p.text || '').join('');
+    if (!txt) throw new Error('Yapay zekâ yanıt vermedi (görsel engellenmiş olabilir).');
+    try { return JSON.parse(txt.replace(/^\s*```(?:json)?\s*/i, '').replace(/\s*```\s*$/, '').trim()); }
+    catch (_) { throw new Error('Yanıt okunamadı, tekrar dene.'); }
+  }
+  throw lastErr || new Error('Servise ulaşılamadı');
+}
+function cleanEntry(e) {
+  const c = x => String(x == null ? '' : x).replace(/\s+/g, ' ').trim().slice(0, 300);
+  return { ring: c(e && e.ring), name: c(e && e.name).replace(/^["“”']+|["“”']+$/g, ''), owner: c(e && e.owner), color: c(e && e.color), notes: c(e && e.notes) };
+}
+async function runScan(file) {
+  if (!navigator.onLine) return toast('Bu özellik için internet gerekir');
+  openModal('Pedigre okunuyor…', `<div class="empty"><img src="logo.png" alt="">Yapay zekâ pedigreyi okuyor.<br>Bu 10–40 saniye sürebilir, ekranı kapatma.</div>`);
+  try {
+    const res = await geminiPed(await filePart(file));
+    if (res.error) throw new Error('Bu görsel bir pedigre gibi görünmüyor.');
+    const root = cleanEntry(res.root);
+    const ped = {}; let n = 0;
+    AI_KEYS.forEach(k => { const e = cleanEntry(res[k]); if (e.ring || e.name) { ped[k] = e; n++; } });
+    if (!root.ring && !root.name && !n) throw new Error('Pedigreden bilgi okunamadı. Daha net bir görselle tekrar dene.');
+    const g = String(res.root && res.root.gender || '').toUpperCase();
+    const gender = OPT.gender.includes(g) ? g : 'BİLİNMİYOR';
+    openForm('birds', null, { name: root.name || root.ring, ring: root.ring, color: root.color, gender, notes: root.notes, pedigree: ped, scanned: true });
+    $('#form').insertAdjacentHTML('afterbegin', `<div class="banner">🤖 Yapay zekâ <b>${n} ata</b> okudu. Bilgileri kontrol edip <b>Kaydet</b>'e bas; pedigre hemen açılır, hatalı yerleri “Atalar”dan düzeltebilirsin.</div>`);
+  } catch (e) {
+    openModal('Okunamadı', `<div class="banner red">${esc(e.message || e)}</div>
+      <div class="btns"><button class="btn" data-a="scanPed">Tekrar dene</button><button class="btn sec" data-a="close">Kapat</button></div>`);
+  }
+}
+
 /* ============ YEDEKLEME ============ */
 const APP_ID = 'kumes-defteri';
 function buildBackup(noPhotos) {
@@ -1165,7 +1279,7 @@ const actions = {
   rmPhoto(d) { formPhotos.splice(+d.i, 1); $('#photoBox').innerHTML = photosHTML(); },
   pedView(d) { pedView(d.id); }, pedEdit(d) { pedEdit(d.id); }, pedSave,
   async setStatus(d) { const b = bird(d.id); if (!b) return; await put('birds', { ...b, status: d.v }); closeModal(); render(); toast('Durum: ' + d.v); },
-  doUpdate: applyUpdate, checkUpdate, guide() { location.href = 'kilavuz.html'; },
+  scanPed, aiKeyChange: aiKeyModal, aiKeySave, doUpdate: applyUpdate, checkUpdate, guide() { location.href = 'kilavuz.html'; },
   chicks(d) { openChicks(d.id); }, addChick(d) { addChick(d.id); }, rebuildPed(d) { rebuildPed(d.id); },
   pedShare(d) { pedShare(d.id, d.t); }, pedSet(d) { pedSettings(d.id); }, pedSetSave,
   useLoft(d) { loftId = d.id; ST.loftId = d.id; saveST(); render(); },
@@ -1189,6 +1303,7 @@ document.addEventListener('click', e => {
 });
 document.addEventListener('change', async e => {
   const t = e.target;
+  if (t.id === 'scanIn' && t.files[0]) { const f = t.files[0]; t.value = ''; runScan(f); return; }
   if (t.dataset.pick) { pedPick(t.dataset.pick, t.value); t.value = ''; return; }
   if (t.dataset.c === 'email') { ST.email = t.value.trim(); await saveST(); return; }
   if (t.id === 'loftSel') {
@@ -1215,7 +1330,7 @@ window.addEventListener('online', () => autoBackup(false));
 document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') autoBackup(false); });
 
 /* ============ GÜNCELLEME ============ */
-const APP_VER = '1.7';
+const APP_VER = '1.8';
 let updateW = null, swReg = null, updating = false;
 function showUpdate(w) { updateW = w; render(); }
 function setupUpdates() {
