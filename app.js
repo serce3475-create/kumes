@@ -256,6 +256,7 @@ function todayHTML() {
     h += `<div class="banner ${ageD >= 14 ? 'red' : ''}"><b>Son yedek ${ageD} gün önce.</b> Bu süredeki değişiklikler yedekte yok.
       <div class="btns"><button class="btn sm" data-a="exportFile">Şimdi yedekle</button><button class="btn sec sm" data-a="goto" data-p="backup">Yedek ayarları</button></div></div>`;
   }
+  if (!birds.length) h += `<div class="card" data-a="guide"><b>👋 Hoş geldin!</b><div class="sub">İlk kuşunu eklemek için alttaki Kuşlar sekmesine geç. Kısa bir kılavuz okumak için dokun.</div></div>`;
   h += `<h3>Kuluçka takibi</h3>`;
   if (!inc.length) h += `<div class="empty">Devam eden kuluçka yok.</div>`;
   inc.sort((a, b) => a.layDate.localeCompare(b.layDate)).forEach(i => {
@@ -376,6 +377,8 @@ function moreHTML() {
     ${item('notes', '📝', 'Notlar', `${cur('notes').length} kayıt`)}
     ${item('lofts', '🏠', 'Kümesler', `${D.lofts.length} kümes`)}
     ${item('backup', '☁️', 'Yedekleme ve ayarlar', needsBackup() ? '⚠ Yedek bekliyor' : '✓ Güncel')}
+    <div class="card row" data-a="guide"><span style="font-size:24px">📖</span>
+      <div class="grow"><b>Kullanım kılavuzu</b><div class="sub">Adım adım anlatım, sık sorulan sorular</div></div><span>›</span></div>
     <div class="card row" data-a="checkUpdate"><span style="font-size:24px">🔄</span>
       <div class="grow"><b>Güncellemeleri kontrol et</b><div class="sub">Sürüm ${APP_VER} · Kümes Defterim</div></div><span>›</span></div>
     <div class="sub" style="text-align:center;margin-top:14px">Mehmet Serçe tarafından camiaya hizmet için ücretsiz hazırlanmıştır.</div>`;
@@ -1161,7 +1164,7 @@ const actions = {
   rmPhoto(d) { formPhotos.splice(+d.i, 1); $('#photoBox').innerHTML = photosHTML(); },
   pedView(d) { pedView(d.id); }, pedEdit(d) { pedEdit(d.id); }, pedSave,
   async setStatus(d) { const b = bird(d.id); if (!b) return; await put('birds', { ...b, status: d.v }); closeModal(); render(); toast('Durum: ' + d.v); },
-  doUpdate: applyUpdate, checkUpdate,
+  doUpdate: applyUpdate, checkUpdate, guide() { location.href = 'kilavuz.html'; },
   chicks(d) { openChicks(d.id); }, addChick(d) { addChick(d.id); }, rebuildPed(d) { rebuildPed(d.id); },
   pedShare(d) { pedShare(d.id, d.t); }, pedSet(d) { pedSettings(d.id); }, pedSetSave,
   useLoft(d) { loftId = d.id; ST.loftId = d.id; saveST(); render(); },
@@ -1211,7 +1214,7 @@ window.addEventListener('online', () => autoBackup(false));
 document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') autoBackup(false); });
 
 /* ============ GÜNCELLEME ============ */
-const APP_VER = '1.5';
+const APP_VER = '1.6';
 let updateW = null, swReg = null, updating = false;
 function showUpdate(w) { updateW = w; render(); }
 function setupUpdates() {

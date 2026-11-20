@@ -1,0 +1,226 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#2b6cb0">
+<title>Kümes Defterim · Kullanım Kılavuzu</title>
+<meta name="description" content="Kümes Defterim nedir, nasıl kurulur, nasıl kullanılır? Adım adım Türkçe kılavuz.">
+<meta property="og:title" content="Kümes Defterim · Kullanım Kılavuzu">
+<meta property="og:description" content="Güvercin yetiştiricileri için ücretsiz, internetsiz çalışan kümes defteri. Kurulum ve kullanım kılavuzu.">
+<meta property="og:image" content="https://serce3475-create.github.io/kumes/og.png">
+<link rel="icon" href="icon-192.png">
+<style>
+:root{--bg:#f3f6fa;--card:#fff;--card2:#e3ecf6;--line:#d3deeb;--tx:#111c28;--mut:#566a80;--acc:#2b6cb0;--on:#fff;--warn:#fff4d6;--warnt:#6b4a00;--warnb:#e7b94a;--ok:#e6f6ec;--okt:#14532d}
+@media(prefers-color-scheme:dark){:root{--bg:#0d141c;--card:#16202b;--card2:#212f40;--line:#2b3a4c;--tx:#e4ecf5;--mut:#93a6bb;--acc:#7db3ea;--on:#0a1d33;--warn:#2f2506;--warnt:#f5d77a;--warnb:#8a6a14;--ok:#0f2a1a;--okt:#86efac}}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--tx);font:17px/1.6 Roboto,-apple-system,system-ui,"Segoe UI",sans-serif}
+.wrap{max-width:760px;margin:0 auto;padding:0 18px 80px}
+.hero{background:linear-gradient(160deg,#2b6cb0,#3d86cf);color:#fff;padding:calc(26px + env(safe-area-inset-top)) 18px 34px;text-align:center}
+.hero img{width:92px;height:92px;background:#fff;border-radius:26px;padding:10px;object-fit:contain}
+.hero h1{margin:14px 0 6px;font-size:30px;line-height:1.2}
+.hero p{margin:0 auto;max-width:520px;opacity:.95}
+.back{display:inline-block;margin-top:16px;color:#fff;text-decoration:none;background:rgba(255,255,255,.18);padding:9px 18px;border-radius:99px;font-weight:600;font-size:15px}
+h2{margin:40px 0 10px;font-size:25px;line-height:1.25;scroll-margin-top:12px}
+h2 .n{display:inline-flex;width:34px;height:34px;border-radius:50%;background:var(--acc);color:var(--on);align-items:center;justify-content:center;font-size:17px;margin-right:10px;vertical-align:2px}
+h3{margin:22px 0 6px;font-size:18px;color:var(--acc)}
+p{margin:8px 0}
+.toc{background:var(--card);border-radius:20px;padding:6px 18px;margin:22px 0}
+.toc a{display:block;padding:9px 0;color:var(--tx);text-decoration:none;border-bottom:1px solid var(--line);font-weight:500}
+.toc a:last-child{border:0}
+.toc a span{color:var(--acc);font-weight:700;margin-right:8px}
+.card{background:var(--card);border-radius:20px;padding:6px 18px 14px;margin:12px 0}
+.feat{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:18px 0}
+.feat div{background:var(--card);border-radius:18px;padding:14px;font-size:15px}
+.feat b{display:block;color:var(--acc);margin-bottom:2px}
+ol,ul{padding-left:22px;margin:8px 0}
+li{margin:6px 0}
+.tip,.warn,.ok{border-radius:16px;padding:12px 15px;margin:14px 0;font-size:15.5px}
+.tip{background:var(--card2)}
+.warn{background:var(--warn);color:var(--warnt);border:1px solid var(--warnb)}
+.ok{background:var(--ok);color:var(--okt)}
+.shot{display:block;margin:14px auto;width:min(300px,82%);border-radius:22px;box-shadow:0 6px 24px rgba(0,0,0,.18);border:1px solid var(--line)}
+.shot.wide{width:min(420px,95%)}
+.cap{text-align:center;color:var(--mut);font-size:13.5px;margin:-4px 0 10px}
+b.k{background:var(--card2);padding:1px 8px;border-radius:8px;font-weight:600;font-size:.93em;white-space:nowrap}
+details{background:var(--card);border-radius:16px;padding:2px 16px;margin:8px 0}
+summary{padding:12px 0;font-weight:600;cursor:pointer}
+details p{margin:0 0 12px;color:var(--mut)}
+.share{background:var(--acc);color:var(--on);border:0;border-radius:99px;padding:14px 26px;font:inherit;font-weight:700;margin:6px 0;width:100%}
+.promo{background:var(--card);border-radius:20px;padding:14px 18px;white-space:pre-wrap;font-size:15px;border:1.5px dashed var(--line)}
+footer{text-align:center;color:var(--mut);font-size:14px;margin-top:40px}
+</style>
+</head>
+<body>
+<div class="hero">
+  <img src="logo.png" alt="Kümes Defterim logosu">
+  <h1>Kümes Defterim</h1>
+  <p>Güvercin kümeni cebinden yönet. Ücretsiz, internetsiz çalışır, verilerin sadece telefonunda kalır.</p>
+  <a class="back" href="index.html">‹ Uygulamaya dön</a>
+</div>
+
+<div class="wrap">
+
+<div class="toc">
+  <a href="#nedir"><span>1</span>Kümes Defterim nedir?</a>
+  <a href="#kurulum"><span>2</span>Telefona kurulum (iPhone / Android)</a>
+  <a href="#ilk"><span>3</span>İlk adımlar: kümeni ve kuşlarını ekle</a>
+  <a href="#pedigre"><span>4</span>Pedigre (soy ağacı) hazırla ve paylaş</a>
+  <a href="#ureme"><span>5</span>Eşleşme, kuluçka ve yavru</a>
+  <a href="#saglik"><span>6</span>Sağlık ve aşı takibi</a>
+  <a href="#diger"><span>7</span>Yarış, alış/satış, notlar, birden fazla kümes</a>
+  <a href="#yedek"><span>8</span>YEDEK ALMAK (çok önemli)</a>
+  <a href="#guncelleme"><span>9</span>Güncelleme</a>
+  <a href="#sss"><span>10</span>Sık sorulan sorular</a>
+  <a href="#tanitim"><span>11</span>Arkadaşlarına tanıt</a>
+</div>
+
+<h2 id="nedir"><span class="n">1</span>Kümes Defterim nedir?</h2>
+<p>Güvercin yetiştiricileri için hazırlanmış, kâğıt defter yerine geçen bir uygulamadır. <b>Hesap, üyelik ve ücret yoktur.</b> Veriler sunucuya gönderilmez, sadece senin telefonunda durur.</p>
+<div class="feat">
+  <div><b>🕊 Kuşlar</b>Fotoğraf, künye, renk, notlar</div>
+  <div><b>🌳 Pedigre</b>3 nesil, kişiye özel, PDF/görsel</div>
+  <div><b>🥚 Kuluçka</b>18–21. gün uyarısı, yavru ekleme</div>
+  <div><b>💉 Sağlık</b>Aşı/ilaç tarihleri ve hatırlatma</div>
+  <div><b>🏁 Yarış</b>Derece ve mesafe kayıtları</div>
+  <div><b>🏠 Çoklu kümes</b>İstediğin kadar küme ekle</div>
+</div>
+<div class="ok"><b>İnternetsiz çalışır.</b> Bir kez kurduktan sonra uçak modunda bile kullanırsın. İnternet sadece güncelleme ve e-posta/yedek paylaşımı için gerekir.</div>
+
+<h2 id="kurulum"><span class="n">2</span>Telefona kurulum</h2>
+<p>App Store veya Play Store'dan indirilmez. Linke girip <b>Ana Ekrana Ekle</b> yaparsın, uygulama diğerleri gibi simge olarak gelir.</p>
+<div class="card">
+<h3>iPhone</h3>
+<ol>
+<li>Linki mutlaka <b>Safari</b> ile aç (WhatsApp içinden değil: linke basıp "Safari'de aç"ı seç).</li>
+<li>Alttaki <b class="k">Paylaş</b> düğmesine (kare ve yukarı ok) dokun.</li>
+<li>Aşağı kaydırıp <b class="k">Ana Ekrana Ekle</b>'yi seç, <b class="k">Ekle</b>'ye bas.</li>
+<li>Bundan sonra uygulamayı <b>ana ekrandaki güvercin simgesinden</b> aç.</li>
+</ol>
+<div class="warn"><b>iPhone'da önemli:</b> Uygulamayı Safari sekmesinde kullanırsan iPhone bir süre sonra verilerini silebilir. Mutlaka ana ekrana ekleyip oradan aç ve düzenli yedek al.</div>
+<h3>Android</h3>
+<ol>
+<li>Linki <b>Chrome</b> ile aç.</li>
+<li>Sağ üstteki <b class="k">⋮</b> menüsüne dokun.</li>
+<li><b class="k">Uygulamayı yükle</b> veya <b class="k">Ana ekrana ekle</b>'yi seç.</li>
+</ol>
+</div>
+
+<h2 id="ilk"><span class="n">3</span>İlk adımlar</h2>
+<p>Uygulama açılınca senin için "Kümesim" adlı bir küme hazır gelir. Adını değiştirmek için <b class="k">Daha → Kümeler → Düzenle</b> yolunu kullan.</p>
+<h3>Kuş eklemek</h3>
+<ol>
+<li>Alttaki <b class="k">Kuşlar</b> sekmesine geç.</li>
+<li>Sağ alttaki <b class="k">＋</b> düğmesine bas.</li>
+<li>İsim ve künyeyi yaz, cinsiyet/renk/doğum tarihini seç, istersen fotoğraf ekle (en fazla 4).</li>
+<li><b class="k">Kaydet</b>'e bas.</li>
+</ol>
+<img class="shot" src="img/kuslar.jpg" alt="Kuşlar listesi" loading="lazy">
+<p class="cap">Kuşlar listesi: arama ve filtreler üstte</p>
+<p>Kuşa dokunursan detayı açılır: bilgileri, fotoğrafları, pedigresi ve sağlık/yarış kayıtları.</p>
+<img class="shot" src="img/kus-detay.jpg" alt="Kuş detayı" loading="lazy">
+<div class="tip"><b>İpucu:</b> Baba ve anne kuşları seçersen yavrunun soy ağacı <b>otomatik</b> dolar (bölüm 5'e bak). Kuşun "Notlar" kısmına yazdıkların pedigrede de görünür.</div>
+<h3>Bugün ekranı</h3>
+<p>Uygulama açılınca ilk bu ekran gelir: yaklaşan kuluçka çıkışları, yaklaşan aşılar ve yedek durumun burada görünür. Bildirim yerine bu ekrana bakıyoruz, bu yüzden arada açıp göz at.</p>
+<img class="shot" src="img/bugun.jpg" alt="Bugün ekranı" loading="lazy">
+
+<h2 id="pedigre"><span class="n">4</span>Pedigre hazırla ve paylaş</h2>
+<ol>
+<li>Kuşa dokun, <b class="k">Pedigre düzenle</b>'yi seç.</li>
+<li>Her ata için künye, isim, yetiştirici, renk ve başarıları yaz. <b>Kayıtlı kuşlardan seç</b> listesinden daha önce eklediğin bir kuşu seçersen onun bilgileri ve kendi ataları otomatik dolar.</li>
+<li><b class="k">Kaydet</b>'e bas. Pedigre hazır!</li>
+<li>Paylaşmak için <b class="k">Görsel olarak paylaş</b> veya <b class="k">PDF olarak paylaş</b>'a dokun, WhatsApp'a ya da Dosyalar'a gönder.</li>
+</ol>
+<img class="shot wide" src="img/pedigre.jpg" alt="Örnek pedigre" loading="lazy">
+<p class="cap">Örnek pedigre çıktısı</p>
+<div class="tip"><b>Kişiye özel yap:</b> Pedigre ekranında <b class="k">Tasarımı özelleştir</b>'e bas. Başlığı, kendi adını, adresini, telefonunu ve renk temasını seç. Bir kez yazman yeterli, tüm pedigrelerde kullanılır. Kuşun fotoğrafı kesilmeden sığar.</div>
+<div class="tip"><b>Atalar otomatik kaydedilir:</b> Yazdığın her ata, kuş listene "PASİF" olarak eklenir. Böylece bir sonraki sefer yeniden yazmadan seçebilirsin. Görmek için Kuşlar'da <b class="k">Durum → PASİF</b> filtresini seç, istersen <b class="k">Aktif yap</b>.</div>
+
+<h2 id="ureme"><span class="n">5</span>Eşleşme, kuluçka ve yavru</h2>
+<ol>
+<li><b class="k">Üreme → Eşleşmeler → ＋</b>: erkek ve dişi kuşu seç, kaydet.</li>
+<li><b class="k">Üreme → Kuluçka → ＋</b>: eşleşmeyi ve yumurtlama tarihini seç. Uygulama 18–21. gün arasındaki çıkış tarihini hesaplar, Bugün ekranında geri sayım gösterir.</li>
+<li>Yavrular çıkınca kuluçka kaydını aç, <b class="k">🐣 Yavrular / yavru ekle</b>'ye bas.</li>
+<li>Sadece <b>isim ve künye</b> yaz. Baba, anne, doğum tarihi ve <b>soy ağacı otomatik</b> gelir.</li>
+</ol>
+<img class="shot" src="img/kulucka.jpg" alt="Kuluçka takibi" loading="lazy">
+<div class="warn">Yavrunun soyunun dolu gelmesi için ebeveynlerin kendi pedigrelerini önce doldurmuş olman gerekir. Sonradan doldurursan yavrunun ekranında <b>Soyu ebeveynlerden yenile</b>'ye bas.</div>
+
+<h2 id="saglik"><span class="n">6</span>Sağlık ve aşı takibi</h2>
+<ol>
+<li><b class="k">Sağlık → ＋</b>: türü (aşı, ilaç, vitamin…), adı ve tarihi yaz.</li>
+<li><b>Sonraki tarih</b> alanına tekrar günü yazarsan, yaklaşırken Bugün ekranında uyarı çıkar.</li>
+<li>Tüm kümeye yapılan aşıda kuş seçme, tek tek kuş için yapıldıysa kuşu seç.</li>
+</ol>
+<img class="shot" src="img/saglik.jpg" alt="Sağlık kayıtları" loading="lazy">
+
+<h2 id="diger"><span class="n">7</span>Yarış, alış/satış, notlar, çoklu kümes</h2>
+<ul>
+<li><b>Daha → Yarış sonuçları:</b> yarış adı, mesafe, derece ve katılan kuş sayısı.</li>
+<li><b>Daha → Alış / Satış:</b> kime ne kadara. Satışta kuşu "SATILDI" yapmayı önerir.</li>
+<li><b>Daha → Notlar:</b> serbest notlar.</li>
+<li><b>Birden fazla kümen mi var?</b> En üstteki kümes adına dokunup <b class="k">＋ Yeni kümes</b>'i seç. Her kümenin kuşları ve kayıtları ayrı tutulur, aynı yedeğe girer.</li>
+</ul>
+
+<h2 id="yedek"><span class="n">8</span>YEDEK ALMAK</h2>
+<div class="warn"><b>Bu bölümü atlama.</b> Veriler sadece telefonunda durur. Telefon kaybolursa, bozulursa veya uygulama silinirse yedeğin yoksa tüm kayıtlar gider. Ayda bir ve önemli kayıtlardan sonra yedek al.</div>
+<h3>Yedeği telefona kaydet</h3>
+<p><b class="k">Daha → Yedekleme → Yedeği telefona kaydet</b>. Android'de dosya <b>İndirilenler</b> klasörüne iner. iPhone'da çıkan menüden <b>Dosyalara Kaydet</b>'i seç.</p>
+<h3>Yedeği e-postana gönder</h3>
+<p>Aynı ekranda e-posta adresini bir kez yaz, <b class="k">Yedeği e-postama gönder</b>'e bas. Telefonunun Mail/Gmail uygulaması dosya ekli olarak açılır, <b>Gönder</b>'e sen basarsın. Böylece yedek e-posta kutunda kalır.</p>
+<img class="shot" src="img/yedek.jpg" alt="Yedekleme ekranı" loading="lazy">
+<h3>Yedekten geri yükle (yeni telefon)</h3>
+<ol>
+<li>Yeni telefonda uygulamayı kur (bölüm 2).</li>
+<li><b class="k">Daha → Yedekleme → Yedek dosyasından geri yükle</b>'ye bas.</li>
+<li>Yedek dosyasını seç. <b>Birleştir</b> veya <b>Tamamen değiştir</b>'i seç (yeni telefonda ikisi aynı sonucu verir).</li>
+</ol>
+<div class="tip"><b>Neden e-posta kendiliğinden gitmiyor?</b> Bir uygulamanın senin yerine e-posta atabilmesi için verilerin bir sunucudan geçmesi gerekirdi. Verilerin sadece sende kalsın diye bunu yapmadık. Üstte bir uyarı çubuğu yedek zamanını hatırlatır.</div>
+
+<h2 id="guncelleme"><span class="n">9</span>Güncelleme</h2>
+<p>Yeni sürüm çıkınca uygulamanın üstünde <b>"🔄 Yeni sürüm hazır — güncellemek için dokun"</b> çubuğu çıkar. Dokun, uygulama yenilenir, kayıtların silinmez. Elle bakmak için <b class="k">Daha → Güncellemeleri kontrol et</b>'i kullan (internet gerekir).</p>
+
+<h2 id="sss"><span class="n">10</span>Sık sorulan sorular</h2>
+<details><summary>Ücretli mi? Üyelik var mı?</summary><p>Hayır. Tamamen ücretsiz, hesap veya üyelik yok. Güvercin camiasına hizmet için hazırlandı.</p></details>
+<details><summary>Verilerim güvende mi? Kimler görebilir?</summary><p>Kayıtlar sadece telefonunda durur, hiçbir sunucuya gönderilmez. Yedek dosyasını sen kime gönderirsen o görür.</p></details>
+<details><summary>İnternet olmadan çalışır mı?</summary><p>Evet. Bir kez kurduktan sonra internetsiz kullanırsın. Güncelleme ve yedeği e-posta ile göndermek için internet gerekir.</p></details>
+<details><summary>Telefonu değiştirirsem ne olur?</summary><p>Yedek dosyanı yeni telefona geri yüklersin (bölüm 8). Bu yüzden yedek almak çok önemli.</p></details>
+<details><summary>iPhone ve Android'de ortak kullanabilir miyiz?</summary><p>Evet, aynı uygulama ikisinde de çalışır. Yedek dosyası iPhone'dan Android'e (veya tersi) geri yüklenebilir.</p></details>
+<details><summary>Kuşu sildim, geri gelir mi?</summary><p>Hayır. Ama yedeğin varsa, silmeden önceki yedeği geri yükleyebilirsin. Uygulama, geri yükleme ve küme silme öncesinde son 3 kopyayı telefonda kendisi de tutar (Daha → Yedekleme → Yerel kopyalar).</p></details>
+<details><summary>Bildirim gelmiyor mu?</summary><p>İnternetsiz çalışan uygulamalarda güvenilir bildirim verilemiyor. Bunun yerine Bugün ekranı aşı ve kuluçka günlerini gösterir; arada açıp bakman yeterli.</p></details>
+<details><summary>Fotoğraflar telefonu doldurur mu?</summary><p>Fotoğraflar küçültülerek saklanır. Çok fazla fotoğraf varsa yedek dosyası büyür; yedek ekranından fotoğrafsız küçük yedek de alabilirsin (tam yedek yerine geçmez).</p></details>
+<details><summary>Bir hata buldum ya da öneri var</summary><p>Uygulamayı sana ileten kişiye haber ver, o da uygulamayı hazırlayan Mehmet Serçe'ye iletsin.</p></details>
+
+<h2 id="tanitim"><span class="n">11</span>Arkadaşlarına tanıt</h2>
+<p>Aşağıdaki düğmeyle linki WhatsApp'tan paylaş, ya da metni kopyala:</p>
+<button class="share" id="shareBtn">📤 Uygulamayı paylaş</button>
+<div class="promo" id="promo">🕊 Kümes Defterim — ücretsiz güvercin kümesi defteri
+
+✔ Kuşlarını, pedigrelerini, kuluçka ve aşı tarihlerini tek yerde tut
+✔ Pedigreni tek dokunuşla PDF/görsel olarak paylaş
+✔ İnternetsiz çalışır, verilerin sadece telefonunda kalır
+✔ iPhone ve Android'de, mağazadan indirmeden, ücretsiz
+
+Güvercin camiasına hizmet için hazırlandı.
+Kurulum ve kılavuz: https://serce3475-create.github.io/kumes/kilavuz.html</div>
+<button class="share" id="copyBtn" style="background:var(--card2);color:var(--tx)">📋 Metni kopyala</button>
+
+<footer>
+  <img src="logo.png" alt="" style="width:44px;opacity:.8"><br>
+  Kümes Defterim · Mehmet Serçe tarafından camiaya hizmet için ücretsiz hazırlanmıştır.
+</footer>
+</div>
+<script>
+const link='https://serce3475-create.github.io/kumes/';
+const txt=()=>document.getElementById('promo').innerText;
+document.getElementById('shareBtn').onclick=async()=>{
+  try{ if(navigator.share) await navigator.share({title:'Kümes Defterim',text:txt()}); else throw 0; }
+  catch(e){ if(e&&e.name==='AbortError')return; location.href='https://wa.me/?text='+encodeURIComponent(txt()); }
+};
+document.getElementById('copyBtn').onclick=async e=>{
+  try{ await navigator.clipboard.writeText(txt()); e.target.textContent='✓ Kopyalandı'; }catch(_){ e.target.textContent='Metni elle seç ve kopyala'; }
+};
+</script>
+</body>
+</html>

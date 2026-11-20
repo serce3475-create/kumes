@@ -1,7 +1,7 @@
 // Kümes Defterim - çevrimdışı önbellek. İnternet varken hep en yeni dosya, yoksa önbellek.
 // Her yeni sürümde aşağıdaki V değeri artırılır; telefon bunu fark edip "Yeni sürüm hazır" gösterir.
-const V = 'kumes-v5';
-const FILES = ['./', 'index.html', 'style.css', 'app.js', 'manifest.webmanifest', 'icon-192.png', 'icon-512.png', 'logo.png', 'og.png'];
+const V = 'kumes-v6';
+const FILES = ['./', 'index.html', 'style.css', 'app.js', 'manifest.webmanifest', 'icon-192.png', 'icon-512.png', 'logo.png', 'og.png', 'kilavuz.html'];
 
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(V).then(c => c.addAll(FILES.map(f => new Request(f, { cache: 'reload' })))));
