@@ -194,6 +194,7 @@ function render() {
       <option value="__new">＋ Yeni kümes…</option></select>
     <button class="btn sm ${pend ? '' : 'sec'}" data-a="goto" data-p="backup">${pend ? '⚠ Yedek' : '✓ Yedek'}</button>
   </header>
+  ${updateW ? `<div class="updbar" data-a="doUpdate">🔄 Yeni sürüm hazır — güncellemek için dokun</div>` : ''}
   <main>${pageHTML()}</main>
   <nav>${NAV.map(([k, ic, lb]) => `<button class="${isNav(k) ? 'on' : ''}" data-a="goto" data-p="${k}"><span>${ic}</span>${lb}</button>`).join('')}</nav>`;
   if (page === 'birds' && $('#blist')) $('#blist').innerHTML = birdListHTML();
@@ -374,7 +375,10 @@ function moreHTML() {
     ${item('sales', '💰', 'Alış / Satış', `${cur('sales').length} kayıt`)}
     ${item('notes', '📝', 'Notlar', `${cur('notes').length} kayıt`)}
     ${item('lofts', '🏠', 'Kümesler', `${D.lofts.length} kümes`)}
-    ${item('backup', '☁️', 'Yedekleme ve ayarlar', needsBackup() ? '⚠ Yedek bekliyor' : '✓ Güncel')}`;
+    ${item('backup', '☁️', 'Yedekleme ve ayarlar', needsBackup() ? '⚠ Yedek bekliyor' : '✓ Güncel')}
+    <div class="card row" data-a="checkUpdate"><span style="font-size:24px">🔄</span>
+      <div class="grow"><b>Güncellemeleri kontrol et</b><div class="sub">Sürüm ${APP_VER} · Kümes Defterim</div></div><span>›</span></div>
+    <div class="sub" style="text-align:center;margin-top:14px">Mehmet Serçe tarafından camiaya hizmet için ücretsiz hazırlanmıştır.</div>`;
 }
 
 /* ---- Kümesler ---- */
@@ -1157,6 +1161,7 @@ const actions = {
   rmPhoto(d) { formPhotos.splice(+d.i, 1); $('#photoBox').innerHTML = photosHTML(); },
   pedView(d) { pedView(d.id); }, pedEdit(d) { pedEdit(d.id); }, pedSave,
   async setStatus(d) { const b = bird(d.id); if (!b) return; await put('birds', { ...b, status: d.v }); closeModal(); render(); toast('Durum: ' + d.v); },
+  doUpdate: applyUpdate, checkUpdate,
   chicks(d) { openChicks(d.id); }, addChick(d) { addChick(d.id); }, rebuildPed(d) { rebuildPed(d.id); },
   pedShare(d) { pedShare(d.id, d.t); }, pedSet(d) { pedSettings(d.id); }, pedSetSave,
   useLoft(d) { loftId = d.id; ST.loftId = d.id; saveST(); render(); },
@@ -1205,6 +1210,43 @@ document.addEventListener('input', e => {
 window.addEventListener('online', () => autoBackup(false));
 document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') autoBackup(false); });
 
+/* ============ GÜNCELLEME ============ */
+const APP_VER = '1.5';
+let updateW = null, swReg = null, updating = false;
+function showUpdate(w) { updateW = w; render(); }
+function setupUpdates() {
+  if (!('serviceWorker' in navigator) || location.protocol === 'file:') return;
+  navigator.serviceWorker.addEventListener('controllerchange', () => { if (updating) location.reload(); });
+  navigator.serviceWorker.register('sw.js').then(reg => {
+    swReg = reg;
+    const watch = r => {
+      if (r.waiting && navigator.serviceWorker.controller) showUpdate(r.waiting);
+      r.addEventListener('updatefound', () => {
+        const w = r.installing; if (!w) return;
+        w.addEventListener('statechange', () => { if (w.state === 'installed' && navigator.serviceWorker.controller) showUpdate(w); });
+      });
+    };
+    watch(reg);
+    const check = () => reg.update().catch(() => {});
+    document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') check(); });
+    window.addEventListener('online', check);
+    setInterval(check, 3600000); check();
+  }).catch(() => {});
+}
+function applyUpdate() {
+  if (!updateW) return;
+  updating = true; toast('Güncelleniyor…');
+  updateW.postMessage('SKIP_WAITING');
+  setTimeout(() => location.reload(), 2500);
+}
+async function checkUpdate() {
+  if (!swReg) return toast('Güncelleme kontrolü bu cihazda kullanılamıyor');
+  if (!navigator.onLine) return toast('İnternet yok');
+  toast('Kontrol ediliyor…');
+  try { await swReg.update(); } catch (_) { return toast('Kontrol edilemedi'); }
+  setTimeout(() => { if (!updateW) toast('Uygulama güncel (sürüm ' + APP_VER + ')'); }, 1500);
+}
+
 /* ============ BAŞLAT ============ */
 async function init() {
   await openDB();
@@ -1219,7 +1261,7 @@ async function init() {
   // günde bir yerel kopya (değişiklik varsa)
   if (ST.lastChange > ST.lastLocalSnap && Date.now() - ST.lastLocalSnap > 864e5) takeSnapshot('otomatik günlük');
   autoBackup(false);
-  if ('serviceWorker' in navigator && location.protocol !== 'file:') navigator.serviceWorker.register('sw.js').catch(() => {});
+  setupUpdates();
 }
 init().catch(e => { document.body.innerHTML = `<pre style="padding:20px;color:#fca5a5">Başlatılamadı: ${esc(e.message || e)}</pre>`; });
 

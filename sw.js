@@ -1,10 +1,14 @@
-// Kümes Defteri - çevrimdışı önbellek (stale-while-revalidate)
-const V = 'kumes-v4';
-const FILES = ['./', 'index.html', 'style.css', 'app.js', 'manifest.webmanifest', 'icon-192.png', 'icon-512.png','logo.png','og.png'];
+// Kümes Defterim - çevrimdışı önbellek. İnternet varken hep en yeni dosya, yoksa önbellek.
+// Her yeni sürümde aşağıdaki V değeri artırılır; telefon bunu fark edip "Yeni sürüm hazır" gösterir.
+const V = 'kumes-v5';
+const FILES = ['./', 'index.html', 'style.css', 'app.js', 'manifest.webmanifest', 'icon-192.png', 'icon-512.png', 'logo.png', 'og.png'];
 
 self.addEventListener('install', e => {
-  e.waitUntil(caches.open(V).then(c => c.addAll(FILES)).then(() => self.skipWaiting()));
+  e.waitUntil(caches.open(V).then(c => c.addAll(FILES.map(f => new Request(f, { cache: 'reload' })))));
+  // skipWaiting yok: kullanıcı "Güncelle"ye dokununca devreye girer (açık ekran bir anda değişmesin)
 });
+
+self.addEventListener('message', e => { if (e.data === 'SKIP_WAITING') self.skipWaiting(); });
 
 self.addEventListener('activate', e => {
   e.waitUntil(
@@ -19,14 +23,18 @@ self.addEventListener('fetch', e => {
   if (req.method !== 'GET') return;
   const url = new URL(req.url);
   if (url.origin !== location.origin) return; // Google/Drive istekleri doğrudan gitsin
-  e.respondWith(
-    caches.open(V).then(async cache => {
-      const cached = await cache.match(req, { ignoreSearch: true });
-      const net = fetch(req).then(res => {
-        if (res && res.ok) cache.put(req, res.clone());
-        return res;
-      }).catch(() => cached);
-      return cached || net;
-    })
-  );
+  e.respondWith((async () => {
+    const cache = await caches.open(V);
+    try {
+      // önce ağ (en fazla 4 sn), olmazsa önbellek
+      const res = await Promise.race([
+        fetch(req, { cache: 'no-cache' }),
+        new Promise((_, rej) => setTimeout(() => rej(new Error('timeout')), 4000))
+      ]);
+      if (res && res.ok) cache.put(req, res.clone());
+      return res;
+    } catch (_) {
+      return (await cache.match(req, { ignoreSearch: true })) || (await cache.match('index.html')) || Response.error();
+    }
+  })());
 });
