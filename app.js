@@ -952,7 +952,7 @@ function importPicked(file) {
   const r = new FileReader();
   r.onload = () => {
     try {
-      const o = validateBackup(JSON.parse(r.result));
+      const o = validateBackup(JSON.parse(String(r.result).replace(/^\uFEFF/, '').trim()));
       pendingImport = o.data;
       const c = s => (o.data[s] || []).length;
       openModal('Yedekten yükle', `<div class="card"><b>Yedek tarihi:</b> ${fmtTime(o.at)}<br>
@@ -1095,7 +1095,8 @@ function backupHTML() {
     <div class="hint">E-posta, telefonundaki Mail/Gmail uygulaması üzerinden gider: dosya otomatik eklenir, adresin kopyalanır. Gönder'e sen basarsın. Uygulama kendi başına e-posta atamaz (bunun için bir sunucuya veri göndermek gerekirdi; verilerin sadece sende kalsın diye böyle yaptık).</div>
     <button class="btn sec block" data-a="exportFile" data-np="1">Fotoğrafsız küçük yedek (tam yedek yerine geçmez)</button>
     <button class="btn sec block" data-a="pickFile">Yedek dosyasından geri yükle</button>
-    <input type="file" id="fileIn" accept=".json,application/json" style="display:none"></div>
+    <div class="sub">iPhone'da: dosyayı önce <b>Dosyalar</b>’a kaydet (Paylaş → Dosyalara Kaydet), sonra buraya basıp o dosyayı seç. Bilgisayardan geldiyse e-postadaki/WhatsApp’taki dosyaya dokunup Paylaş → Dosyalara Kaydet’i kullan.</div>
+    <input type="file" id="fileIn" style="display:none"></div>
 
   <details class="adv"><summary>Gelişmiş: Google Drive ile otomatik yedek (isteğe bağlı)</summary>
     <div class="sub">Kurulumu biraz teknik (Google Client ID gerekir). Çoğu kullanıcı için yukarıdaki yöntemler yeterlidir.</div>
@@ -1214,7 +1215,7 @@ window.addEventListener('online', () => autoBackup(false));
 document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') autoBackup(false); });
 
 /* ============ GÜNCELLEME ============ */
-const APP_VER = '1.6';
+const APP_VER = '1.7';
 let updateW = null, swReg = null, updating = false;
 function showUpdate(w) { updateW = w; render(); }
 function setupUpdates() {
